@@ -15,12 +15,21 @@ var casper = require('casper').create({
 
 var utils = require('utils');
 var fs = require('fs');
+
+var sites = [];
+if (!casper.cli.options['sites']) {
+    // scrape all sites if nothing was specified
+    sites = fs.list('sites/').filter(function(name) {
+        return (name != '.' && name != '..');
+    });
+}
+
 var bowl = {
     q: casper.cli.get(0),
     results: {},
     sites: {},
     input: {
-        sites: casper.cli.options['sites'].split(',')
+        sites: sites
     }
 };
 
@@ -46,7 +55,7 @@ casper.run(function() {
     var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}]+', 'g'), '-');
 
     if (!fs.exists(folder)) {
-        fs.makeDirectory(folder);
+        fs.makeTree(folder);
     }
 
     for (var site in bowl.results) {
