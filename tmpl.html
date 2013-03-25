@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title><%= q + ' - ' + site %></title>
+  </head>
+  <body>
+
+    <% for (var sitename in data) { %>
+    <h3><%= sitename %></h3>
+    <ul>
+      <% for (var i in data[sitename]) { %>
+      <li>
+        <a href="<%= data[sitename][i].link %>"><%= data[sitename][i].title  %></a>
+      </li>
+      <% } %>
+    </ul>
+    <% } %>
+
+</body>
+</html>
