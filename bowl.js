@@ -22,6 +22,8 @@ if (!casper.cli.options['sites']) {
     sites = fs.list('sites/').filter(function(name) {
         return (name != '.' && name != '..');
     });
+} else {
+    sites = casper.cli.get('sites').split(','); 
 }
 
 var bowl = {
@@ -42,7 +44,7 @@ casper.start().each(bowl.input.sites, function(self, site) {
     }
 
     phantom.injectJs(scrapper);
-
+ 
     self
         .thenOpen(bowl.sites[site].url)
         .then(bowl.sites[site].process);
@@ -52,7 +54,7 @@ casper.start().each(bowl.input.sites, function(self, site) {
 casper.run(function() {
         
     var template = fs.read('tmpl.html');
-    var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}]+', 'g'), '-');
+    var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
 
     if (!fs.exists(folder)) {
         fs.makeTree(folder);
@@ -69,7 +71,7 @@ casper.run(function() {
         });
         fs.write(file, output);
     }
-
+ 
     var all = folder + '/all.html';
     var allOutput = _.template(template, {
         q: bowl.q,
