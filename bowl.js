@@ -17,13 +17,23 @@ var utils = require('utils');
 var fs = require('fs');
 
 var sites = [];
-if (!casper.cli.options['sites']) {
+var suites = [];
+
+if (casper.cli.options['suites']) {
+    // --suites
+    suites = casper.cli.options['suites'].split(',');
+    for (var i in suites) {
+        sites = sites.concat(fs.read('suites/' + suites[i]).trim().split("\n"));
+    };
+    sites = _.uniq(sites);
+} else if (casper.cli.options['sites']) {
+    // --sites
+    sites = casper.cli.get('sites').split(','); 
+} else {
     // scrape all sites if nothing was specified
     sites = fs.list('sites/').filter(function(name) {
         return (name != '.' && name != '..');
     });
-} else {
-    sites = casper.cli.get('sites').split(','); 
 }
 
 var bowl = {
@@ -49,7 +59,6 @@ casper.start().each(bowl.input.sites, function(self, site) {
         .thenOpen(bowl.sites[site].url)
         .then(bowl.sites[site].process);
 });
-
 
 casper.run(function() {
         
