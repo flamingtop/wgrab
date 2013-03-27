@@ -19,6 +19,12 @@ var fs = require('fs');
 var sites = [];
 var suites = [];
 
+if (!casper.cli.get(0) || !casper.cli.get(0).trim().length) {
+    casper.echo("Use a search keyword.");
+    casper.echo("bowl.js KEYWORD");
+    casper.exit();
+}
+
 if (casper.cli.options['suites']) {
     // --suites
     suites = casper.cli.options['suites'].split(',');
