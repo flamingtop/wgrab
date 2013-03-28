@@ -68,7 +68,7 @@ casper.start().each(bowl.input.sites, function(self, site) {
 
 casper.run(function() {
         
-    var template = fs.read('tmpl.html');
+    var template = fs.read('include/tmpl.html');
     var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
 
     if (!fs.exists(folder)) {
