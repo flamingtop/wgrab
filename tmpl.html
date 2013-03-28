@@ -1,11 +1,22 @@
 <html>
   <head>
     <title><%= q + ' - ' + site %></title>
+    <style type="text/css">
+      body { font-family: Consolas,Verdana,sans-serif; }
+      a:link { text-decoration: none;  }
+      #content > h3 { text-align: right; font-size: 32px; border-bottom: 1px solid #eee; }
+      #content > h3 a:link { color: #ccc;  }
+      #content > h3:hover { cursor: pointer; }
+      #content > ul { display:none; list-style-type: tibetan; }
+      #content > ul li { padding: .15em; color: #ccc; }
+    </style>
   </head>
   <body>
 
+    <div id="content">
+      
     <% for (var sitename in data) { %>
-    <h3><%= sitename %></h3>
+    <h3><a href="#"><%= sitename %></a></h3>
     <ul>
       <% for (var i in data[sitename]) { %>
       <li>
@@ -15,5 +26,15 @@
     </ul>
     <% } %>
 
+    </div>
+
+    <script src="../../include/jquery.min.js"></script>
+    <script>
+        $('#content h3').click(function(e) {
+          e.preventDefault();
+          $(this).next('ul').slideToggle('fast');
+        })
+        .eq(0).next('ul').show();
+    </script>
 </body>
 </html>
