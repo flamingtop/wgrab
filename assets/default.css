@@ -1,0 +1,46 @@
+body {
+    font-family: Helvetica,Tahoma,sans-serif;
+    /* background-image: url(images/concrete_wall_2.png); */
+    /* background-image: url(images/ps_neutral.png); */
+}
+
+a:link {
+    text-decoration: none;
+    color: black;
+    padding: .1em;
+    font-weight: 200;
+    font-size: 24px;
+    -webkit-transition: 0.20s ease-in;
+    -moz-transition: 0.20s ease-in;
+}
+
+a:hover {
+    color: white;
+    background: darkred;
+};
+
+a:visited {
+    color: grey;
+}
+
+#content > h3 {
+    text-align:right;
+}
+
+#content > h3 a:link {
+    color: #ccc;
+}
+
+#content > h3:hover {
+    cursor: pointer;
+}
+
+#content > ul {
+    display:none;
+    list-style-type: tibetan;
+}
+
+#content > ul li {
+    color: darkred;
+    margin: .3em 0;
+}
