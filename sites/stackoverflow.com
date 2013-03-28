@@ -12,7 +12,7 @@ bowl.sites['stackoverflow.com'] = {
                 $(selector).each(function() {
                     things.push({
                         title: $(this).text(),
-                        link: $(this).attr('href')
+                        link: 'http://stackoverflow.com' + $(this).attr('href')
                     });
                 });
                 return things;
