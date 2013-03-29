@@ -1,15 +1,15 @@
 body {
-    font-family: Helvetica,Tahoma,sans-serif;
+    font-family: Cambria,Georgia,sans-serif;
+    margin-bottom: 50em;
     /* background-image: url(images/concrete_wall_2.png); */
     /* background-image: url(images/ps_neutral.png); */
 }
 
 a:link {
     text-decoration: none;
-    color: black;
     padding: .1em;
     font-weight: 200;
-    font-size: 24px;
+    font-size: 18px;
     -webkit-transition: 0.20s ease-in;
     -moz-transition: 0.20s ease-in;
 }
@@ -17,17 +17,17 @@ a:link {
 a:hover {
     color: white;
     background: darkred;
-};
-
-a:visited {
-    color: grey;
 }
 
 #content > h3 {
-    text-align:right;
+    text-align: right;
+    border-bottom: 1px dotted #eee;
+    padding-right: .1em;
 }
 
 #content > h3 a:link {
+    font-size: 12px;
+    font-family: Verdana, serif;
     color: #ccc;
 }
 
@@ -36,7 +36,6 @@ a:visited {
 }
 
 #content > ul {
-    display:none;
     list-style-type: tibetan;
 }
 
