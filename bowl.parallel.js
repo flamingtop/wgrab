@@ -1,4 +1,8 @@
 
+var date = new Date();
+
+console.log('start ' + date.getMinutes() + ':' + date.getSeconds());
+
 phantom.injectJs('include/underscore-min.js');
 phantom.injectJs('include/xregexp-all-min.js');
 
@@ -59,8 +63,8 @@ casper.start().each(bowl.input.sites, function(self, site) {
  
     done[site] = false;
     instances[site] = require('casper').create({
-        verbose: true,
-        logLevel: "debug",
+        // nverbose: true,
+        // logLevel: "debug",
         clientScripts: ['include/jquery.min.js'],
         pageSettings: {
             loadImages: false,
@@ -87,9 +91,6 @@ for (var s in instances) {
 
 var check = function() {
     setTimeout(function() {
-
-        utils.dump(done);
-
         var alldone = true;
         for (var i in done) {
             if (done[i] == false) {
@@ -97,7 +98,6 @@ var check = function() {
                 break;
             }
         }
-
 
         if (alldone) {
             console.log('all done');
@@ -119,6 +119,10 @@ var check = function() {
                 });
                 fs.write(file, output);
             }
+
+            var date = new Date();
+            console.log('finish ' + date.getMinutes() + ':' + date.getSeconds());
+
             casper.exit();
         } else {
             console.log('check');

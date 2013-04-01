@@ -1,10 +1,12 @@
+var date = new Date();
+console.log('start ' + date.getMinutes() + ':' + date.getSeconds());
 
 phantom.injectJs('include/underscore-min.js');
 phantom.injectJs('include/xregexp-all-min.js');
 
 var casper = require('casper').create({
-    verbose: true,
-    logLevel: "debug",
+    // verbose: true,
+    // logLevel: "debug",
     clientScripts: ['include/jquery.min.js'],
     pageSettings: {
         loadImages: false,
@@ -94,6 +96,11 @@ casper.run(function() {
         data: bowl.results
     });
     fs.write(all, allOutput);
+
+
+    var date = new Date();
+    console.log('finish ' + date.getMinutes() + ':' + date.getSeconds());
+
 
     this.exit();
 
