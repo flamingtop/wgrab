@@ -36,7 +36,7 @@ a:hover {
 }
 
 #content > ul {
-    list-style-type: tibetan;
+    list-style-type: none;
 }
 
 #content > ul li {
