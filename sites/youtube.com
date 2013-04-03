@@ -17,11 +17,9 @@ plugins['youtube.com'] = {
                 });
                 return things;
             });
-            output.results['youtube.com'] = data;
+            RESULTS['youtube.com'] = data;
         });
 
     }
 
 };
-
-

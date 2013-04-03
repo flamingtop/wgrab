@@ -17,7 +17,7 @@ plugins['amazon.com'] = {
                 });
                 return things;
             });
-            output.results['amazon.com'] = data;
+            RESULTS['amazon.com'] = data;
         });
     }
 };

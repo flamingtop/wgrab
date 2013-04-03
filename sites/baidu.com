@@ -17,7 +17,7 @@ plugins['baidu.com'] = {
                     });
                     return things;
                 });
-                output.results['baidu.com'] = data;
+                RESULTS['baidu.com'] = data;
         });
 
     }

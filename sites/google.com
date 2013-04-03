@@ -17,7 +17,7 @@ plugins['google.com'] = {
                 });
                 return things;
             });
-            output.results['google.com'] = data;
+            RESULTS['google.com'] = data;
         });
 
     }

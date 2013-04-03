@@ -27,7 +27,7 @@ plugins['infoq.com'] = {
                 });
                 return things;
             });
-            output.results['infoq.com'] = data;
+            RESULTS['infoq.com'] = data;
         });
 
     }

@@ -10,9 +10,7 @@ cli = casper.cli;
 
 var
 plugins = {},
-output = {};
-
-output.results = {};
+RESULTS = {};
 
 var 
 input = {};
@@ -48,10 +46,6 @@ tick(); // constantly check if all jobs are done
 /* helpers */
 function tick() {
     setTimeout(function() {
-
-        console.log('tick');
-        utils.dump(output);
-
         var alldone = true;
         for (var i in done) {
             if (done[i] === false) {
@@ -69,10 +63,10 @@ function tick() {
                 fs.makeTree(folder);
             }
 
-            for (var site in output.results) {
+            for (var site in RESULTS) {
                 var file = folder + '/' + site + '.html';
                 var data = {};
-                data[site] = output.results[site];
+                data[site] = RESULTS[site];
                 var html = _.template(template, {
                     q: input.q,
                     site: site,
@@ -85,7 +79,7 @@ function tick() {
             var allOutput = _.template(template, {
                 q: input.q,
                 site: 'All',
-                data: output.results
+                data: RESULTS
             });
             fs.write(all, allOutput);
 

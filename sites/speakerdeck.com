@@ -17,7 +17,7 @@ plugins['speakerdeck.com'] = {
                 });
                 return things;
             });
-            output.results['speakerdeck.com'] = data;
+            RESULTS['speakerdeck.com'] = data;
         });
 
     }

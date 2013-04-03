@@ -17,7 +17,7 @@ plugins['stackoverflow.com'] = {
                 });
                 return things;
             });
-            output.results['stackoverflow.com'] = data;
+            RESULTS['stackoverflow.com'] = data;
         });
 
     }

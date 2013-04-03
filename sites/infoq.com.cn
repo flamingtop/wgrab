@@ -27,7 +27,7 @@ plugins['infoq.com.cn'] = {
                 });
                 return things;
             });
-            output.results['infoq.com.cn'] = data;
+            RESULTS['infoq.com.cn'] = data;
         });
 
     }
