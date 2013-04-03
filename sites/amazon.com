@@ -1,10 +1,10 @@
 
 // not working well
-bowl.sites['amazon.com'] = {
+plugins['amazon.com'] = {
     url: 'http://amazon.com',
     process: function() {
         this.then(function() {
-            this.fill('form[name=site-search]', {'field-keywords': bowl.q}, true);
+            this.fill('form[name=site-search]', {'field-keywords': input.q}, true);
         });
         this.then(function() {
             var data = this.evaluate(function() {
@@ -17,7 +17,7 @@ bowl.sites['amazon.com'] = {
                 });
                 return things;
             });
-            bowl.results['amazon.com'] = data;
+            output.results['amazon.com'] = data;
         });
     }
 };

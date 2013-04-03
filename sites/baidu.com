@@ -1,9 +1,9 @@
-bowl.sites['baidu.com'] = {
+plugins['baidu.com'] = {
     url: 'http://baidu.com',
     process: function() {
 
         this.then(function() {
-            this.fill('form[name=f]', {'wd': bowl.q}, true);
+            this.fill('form[name=f]', {'wd': input.q}, true);
         });
 
         this.then(function() {
@@ -17,7 +17,7 @@ bowl.sites['baidu.com'] = {
                     });
                     return things;
                 });
-                bowl.results['baidu.com'] = data;
+                output.results['baidu.com'] = data;
         });
 
     }

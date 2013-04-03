@@ -1,9 +1,9 @@
-bowl.sites['speakerdeck.com'] = {
+plugins['speakerdeck.com'] = {
     url: 'http://speakerdeck.com',
     process: function() {
         
         this.then(function() {
-            this.fill('form#search_form', {'q': bowl.q}, true);
+            this.fill('form#search_form', {'q': input.q}, true);
         });
 
         this.then(function() {
@@ -17,7 +17,7 @@ bowl.sites['speakerdeck.com'] = {
                 });
                 return things;
             });
-            bowl.results['speakerdeck.com'] = data;
+            output.results['speakerdeck.com'] = data;
         });
 
     }

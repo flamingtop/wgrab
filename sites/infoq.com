@@ -1,13 +1,13 @@
 
 
-bowl.sites['infoq.com'] = {
+plugins['infoq.com'] = {
     url: 'http://infoq.com',
     process: function() {
         
         this.then(function() {
             this.fill('form#cse-search-box', {
-              search: bowl.q,
-              queryString: bowl.q,
+              search: input.q,
+              queryString: input.q,
               searchOrder: 'relevancy'
             }, true);
         });
@@ -27,7 +27,7 @@ bowl.sites['infoq.com'] = {
                 });
                 return things;
             });
-            bowl.results['infoq.com'] = data;
+            output.results['infoq.com'] = data;
         });
 
     }

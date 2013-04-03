@@ -1,81 +1,39 @@
-// Written by Shawn X. <shallway.xu@gmail.com>
 
-// weapons of mass desctruction
 phantom.injectJs('include/underscore-min.js');
 phantom.injectJs('include/xregexp-all-min.js');
 
 var 
-// The master casper instance, which doesn't do any scraping by itself
 casper = require('casper').create(),
-// utils helpers, see http://casperjs.org/api.html#utils
 utils = require('utils'),
-// filesystem helpers, see https://github.com/ariya/phantomjs/wiki/API-Reference-FileSystem
 fs = require('fs'),
-// scrapper instances
+cli = casper.cli;
+
+var
+plugins = {},
+output = {};
+
+output.results = {};
+
+var 
+input = {};
+input.q = (cli.has(0) && cli.get(0).trim().length > 0) ? cli.get(0).trim() : null;
+input.suites = (cli.has('suites') && cli.get('suites').trim().length > 0) ? cli.get('suites').trim().split(',') : [];
+input.sites = (cli.has('sites') && cli.get('sites').trim().length > 0) ? cli.get('sites').trim().split(',') : [];
+input.debug = cli.has('debug') ? true : false;
+input.verbose = cli.has('verbose') ? true : false;
+
+input.q || casper.die("Please specify a search keyword.", 1);
+
+input.sites = getSites(); // sites to scrape
+
+var
+// casperjs intances
 instances = {},
-// status
-done = {},
-// things to be passed to the scrappers explicitly
-bowl = {
-    // the search keyword
-    q: casper.cli.get(0),
-    // the results placeholder
-    results: {},
-    sites: {},
-    input: {}
-};
+// job status
+done = {};
 
-if (!casper.cli.get(0) || !casper.cli.get(0).trim().length) {
-    casper.echo("Use a search keyword.");
-    casper.echo("bowl.js KEYWORD");
-    casper.exit();
-}
-
-/* figure out sites to scrape */
-if (casper.cli.options['suites']) {
-    // option --suites
-    var suites = casper.cli.options['suites'].split(',');
-    for (var i in suites) {
-        // var sites = sites.concat(fs.read('suites/' + suites[i]).trim().split("\n"));
-        var sites = fs.read('suites/' + suites[i]).trim().split("\n");
-    };
-    bowl.input.sites = _.uniq(sites);
-} else if (casper.cli.options['sites']) {
-    // option --sites
-    bowl.input.sites = casper.cli.get('sites').split(','); 
-} else {
-    bowl.input.sites = fs.list('sites/').filter(function(name) {
-        return (name != '.' && name != '..');
-    });
-}
-
-/* scrape! in parallel */
-casper.start().each(bowl.input.sites, function(self, site) {
-    var scrapper = 'sites/' + site;
-
-    if (!fs.exists(scrapper)) {
-        this.echo(scrapper + " doesn't exist. Skipped");
-        return;
-    }
-
-    phantom.injectJs(scrapper);
- 
-    done[site] = false;
-    instances[site] = require('casper').create({
-        verbose: true,
-         logLevel: "debug",
-        clientScripts: ['include/jquery.min.js'],
-        pageSettings: {
-            loadImages: false,
-            loadPlugins: false,
-            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
-        }
-    });
-    instances[site]
-        .start()
-        .open(bowl.sites[site].url)
-        .then(bowl.sites[site].process);
-});
+// scrape!
+_.each(input.sites, scrape);
 
 for (var s in instances) {
     instances[s].run(function(ss) {
@@ -85,8 +43,14 @@ for (var s in instances) {
     }(s));
 }
 
-var check = function() {
+tick(); // constantly check if all jobs are done
+
+/* helpers */
+function tick() {
     setTimeout(function() {
+
+        console.log('tick');
+        utils.dump(output);
 
         var alldone = true;
         for (var i in done) {
@@ -99,43 +63,77 @@ var check = function() {
         if (alldone) {
 
             var template = fs.read('include/tmpl.html');
-            var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
+            var folder = 'results/' + input.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
 
             if (!fs.exists(folder)) {
                 fs.makeTree(folder);
             }
 
-            for (var site in bowl.results) {
+            for (var site in output.results) {
                 var file = folder + '/' + site + '.html';
                 var data = {};
-                data[site] = bowl.results[site];
-                var output = _.template(template, {
-                    q: bowl.q,
+                data[site] = output.results[site];
+                var html = _.template(template, {
+                    q: input.q,
                     site: site,
                     data: data
                 });
-                fs.write(file, output);
+                fs.write(file, html);
             }
 
             var all = folder + '/all.html';
             var allOutput = _.template(template, {
-                q: bowl.q,
+                q: input.q,
                 site: 'All',
-                data: bowl.results
+                data: output.results
             });
             fs.write(all, allOutput);
 
             casper.exit();
 
         } else {
-            console.log('tick');
-            check();
+            tick();
         }
 
     }, 1000);
 };
 
-check();
+function getSites() {
+   var sites = [];
+    if (!input.suites && !input.sites) {
+        sites = fs.list('sites/').filter(function(name) {
+            return (name != '.' && name != '..');
+        });
+    } else {
+        sites = sites.concat(input.sites);
+        for (var i in input.suites) {
+            sites = sites.concat(fs.read('suites/' + input.suites[i]).trim().split("\n"));
+        }
+    }
+    return sites;
+}
 
+function scrape(site) {
+    var scrapper = 'sites/' + site;
+    fs.exists(scrapper) || this.die(scrapper + " doesn't exist. Skipped", 1);
 
+    phantom.injectJs(scrapper);
+ 
+    done[site] = false;
+    instances[site] = require('casper').create({
+        verbose: input.verbose,
+        logLevel: input.debug ? "debug" : "info",
+        clientScripts: ['include/jquery.min.js'],
+        pageSettings: {
+            loadImages: false,
+            loadPlugins: false,
+            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
+        }
+    });
+    instances[site]
+        .start()
+        .open(plugins[site].url)
+        .then(plugins[site].process);
+
+}
 

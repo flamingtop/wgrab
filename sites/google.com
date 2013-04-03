@@ -1,9 +1,9 @@
-bowl.sites['google.com'] = {
+plugins['google.com'] = {
     url: 'http://google.com',
     process: function() {
         
         this.then(function() {
-            this.fill('form', {'q': bowl.q}, true);
+            this.fill('form', {'q': input.q}, true);
         });
 
         this.then(function() {
@@ -17,7 +17,7 @@ bowl.sites['google.com'] = {
                 });
                 return things;
             });
-            bowl.results['google.com'] = data;
+            output.results['google.com'] = data;
         });
 
     }

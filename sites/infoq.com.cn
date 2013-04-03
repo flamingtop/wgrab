@@ -1,13 +1,13 @@
 
 
-bowl.sites['infoq.com.cn'] = {
+plugins['infoq.com.cn'] = {
     url: 'http://infoq.com/cn/',
     process: function() {
         
         this.then(function() {
             this.fill('form#cse-search-box', {
-              search: bowl.q,
-              queryString: bowl.q,
+              search: input.q,
+              queryString: input.q,
               searchOrder: 'relevancy'
             }, true);
         });
@@ -27,7 +27,7 @@ bowl.sites['infoq.com.cn'] = {
                 });
                 return things;
             });
-            bowl.results['infoq.com.cn'] = data;
+            output.results['infoq.com.cn'] = data;
         });
 
     }

@@ -1,9 +1,9 @@
-bowl.sites['youtube.com'] = {
+plugins['youtube.com'] = {
     url: 'http://youtube.com',
     process: function() {
         
         this.then(function() {
-            this.fill('form#masthead-search', {'search_query': bowl.q}, true);
+            this.fill('form#masthead-search', {'search_query': input.q}, true);
         });
 
         this.then(function() {
@@ -17,7 +17,7 @@ bowl.sites['youtube.com'] = {
                 });
                 return things;
             });
-            bowl.results['youtube.com'] = data;
+            output.results['youtube.com'] = data;
         });
 
     }

@@ -1,7 +1,7 @@
-bowl.sites['stackoverflow.com'] = {
+plugins['stackoverflow.com'] = {
     url: 'http://stackoverflow.com',
     process: function() {
-        this.thenOpen("http://stackoverflow.com/search?tab=votes&q=" + bowl.q);
+        this.thenOpen("http://stackoverflow.com/search?tab=votes&q=" + input.q);
         this.then(function() {
             this.click('#tabs a[title*=vote]');
         });
@@ -17,7 +17,7 @@ bowl.sites['stackoverflow.com'] = {
                 });
                 return things;
             });
-            bowl.results['stackoverflow.com'] = data;
+            output.results['stackoverflow.com'] = data;
         });
 
     }
