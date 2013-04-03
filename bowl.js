@@ -1,25 +1,29 @@
-var date = new Date();
-console.log('start ' + date.getMinutes() + ':' + date.getSeconds());
+// Written by Shawn X. <shallway.xu@gmail.com>
 
+// weapons of mass desctruction
 phantom.injectJs('include/underscore-min.js');
 phantom.injectJs('include/xregexp-all-min.js');
 
-var casper = require('casper').create({
-    // verbose: true,
-    // logLevel: "debug",
-    clientScripts: ['include/jquery.min.js'],
-    pageSettings: {
-        loadImages: false,
-        loadPlugins: false,
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
-    }
-});
-
-var utils = require('utils');
-var fs = require('fs');
-
-var sites = [];
-var suites = [];
+var 
+// The master casper instance, which doesn't do any scraping by itself
+casper = require('casper').create(),
+// utils helpers, see http://casperjs.org/api.html#utils
+utils = require('utils'),
+// filesystem helpers, see https://github.com/ariya/phantomjs/wiki/API-Reference-FileSystem
+fs = require('fs'),
+// scrapper instances
+instances = {},
+// status
+done = {},
+// things to be passed to the scrappers explicitly
+bowl = {
+    // the search keyword
+    q: casper.cli.get(0),
+    // the results placeholder
+    results: {},
+    sites: {},
+    input: {}
+};
 
 if (!casper.cli.get(0) || !casper.cli.get(0).trim().length) {
     casper.echo("Use a search keyword.");
@@ -27,32 +31,25 @@ if (!casper.cli.get(0) || !casper.cli.get(0).trim().length) {
     casper.exit();
 }
 
+/* figure out sites to scrape */
 if (casper.cli.options['suites']) {
-    // --suites
-    suites = casper.cli.options['suites'].split(',');
+    // option --suites
+    var suites = casper.cli.options['suites'].split(',');
     for (var i in suites) {
-        sites = sites.concat(fs.read('suites/' + suites[i]).trim().split("\n"));
+        // var sites = sites.concat(fs.read('suites/' + suites[i]).trim().split("\n"));
+        var sites = fs.read('suites/' + suites[i]).trim().split("\n");
     };
-    sites = _.uniq(sites);
+    bowl.input.sites = _.uniq(sites);
 } else if (casper.cli.options['sites']) {
-    // --sites
-    sites = casper.cli.get('sites').split(','); 
+    // option --sites
+    bowl.input.sites = casper.cli.get('sites').split(','); 
 } else {
-    // scrape all sites if nothing was specified
-    sites = fs.list('sites/').filter(function(name) {
+    bowl.input.sites = fs.list('sites/').filter(function(name) {
         return (name != '.' && name != '..');
     });
 }
 
-var bowl = {
-    q: casper.cli.get(0),
-    results: {},
-    sites: {},
-    input: {
-        sites: sites
-    }
-};
-
+/* scrape! in parallel */
 casper.start().each(bowl.input.sites, function(self, site) {
     var scrapper = 'sites/' + site;
 
@@ -63,49 +60,82 @@ casper.start().each(bowl.input.sites, function(self, site) {
 
     phantom.injectJs(scrapper);
  
-    self
-        .thenOpen(bowl.sites[site].url)
+    done[site] = false;
+    instances[site] = require('casper').create({
+        verbose: true,
+         logLevel: "debug",
+        clientScripts: ['include/jquery.min.js'],
+        pageSettings: {
+            loadImages: false,
+            loadPlugins: false,
+            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
+        }
+    });
+    instances[site]
+        .start()
+        .open(bowl.sites[site].url)
         .then(bowl.sites[site].process);
 });
 
-casper.run(function() {
-        
-    var template = fs.read('include/tmpl.html');
-    var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
+for (var s in instances) {
+    instances[s].run(function(ss) {
+        return function() {
+           done[ss] = true;
+        };
+    }(s));
+}
 
-    if (!fs.exists(folder)) {
-        fs.makeTree(folder);
-    }
+var check = function() {
+    setTimeout(function() {
 
-    for (var site in bowl.results) {
-        var file = folder + '/' + site + '.html';
-        var data = {};
-        data[site] = bowl.results[site];
-        var output = _.template(template, {
-            q: bowl.q,
-            site: site,
-            data: data
-        });
-        fs.write(file, output);
-    }
- 
-    var all = folder + '/all.html';
-    var allOutput = _.template(template, {
-        q: bowl.q,
-        site: 'All',
-        data: bowl.results
-    });
-    fs.write(all, allOutput);
+        var alldone = true;
+        for (var i in done) {
+            if (done[i] === false) {
+                alldone = false;
+                break;
+            }
+        }
 
+        if (alldone) {
 
-    var date = new Date();
-    console.log('finish ' + date.getMinutes() + ':' + date.getSeconds());
+            var template = fs.read('include/tmpl.html');
+            var folder = 'results/' + bowl.q.replace(XRegExp('[^\\p{L}\\d]+', 'g'), '-');
 
+            if (!fs.exists(folder)) {
+                fs.makeTree(folder);
+            }
 
-    this.exit();
+            for (var site in bowl.results) {
+                var file = folder + '/' + site + '.html';
+                var data = {};
+                data[site] = bowl.results[site];
+                var output = _.template(template, {
+                    q: bowl.q,
+                    site: site,
+                    data: data
+                });
+                fs.write(file, output);
+            }
 
-});
+            var all = folder + '/all.html';
+            var allOutput = _.template(template, {
+                q: bowl.q,
+                site: 'All',
+                data: bowl.results
+            });
+            fs.write(all, allOutput);
 
+            casper.exit();
+
+        } else {
+            console.log('tick');
+            check();
+        }
+
+    }, 1000);
+};
+
+check();
 
 
 
