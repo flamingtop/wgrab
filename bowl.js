@@ -22,33 +22,26 @@ input.verbose = cli.has('verbose') ? true : false;
 
 input.q || casper.die("Please specify a search keyword.", 1);
 
-input.sites = getSites(); // sites to scrape
+// sites to scrape
+input.sites = getSites();
 
-var
-// casperjs intances
-instances = {},
-// job status
-done = {};
+// scrape each and every site in input.sites
+// results pushed into RESULTS
+var jobs = run(input.sites);
 
-// scrape!
-_.each(input.sites, scrape);
+// constantly check jobs status
+// if all jobs are done, flush the results to files, otherwise keep ticking
+tick(jobs);
 
-for (var s in instances) {
-    instances[s].run(function(ss) {
-        return function() {
-           done[ss] = true;
-        };
-    }(s));
-}
+///////////////////////////////////////////////////////////
 
-tick(); // constantly check if all jobs are done
-
-/* helpers */
-function tick() {
+function tick(jobs) {
     setTimeout(function() {
+
         var alldone = true;
-        for (var i in done) {
-            if (done[i] === false) {
+
+        for (var s in jobs) {
+            if (plugins[s].done === undefined) {
                 alldone = false;
                 break;
             }
@@ -83,10 +76,11 @@ function tick() {
             });
             fs.write(all, allOutput);
 
+            console.log('All done');
             casper.exit();
 
         } else {
-            tick();
+            tick(jobs);
         }
 
     }, 1000);
@@ -107,27 +101,34 @@ function getSites() {
     return sites;
 }
 
-function scrape(site) {
-    var scrapper = 'sites/' + site;
-    fs.exists(scrapper) || this.die(scrapper + " doesn't exist. Skipped", 1);
+function run(sites) {
+    var jobs = {};
+    
+    _.each(sites, function(site) {
+        var scrapper = 'sites/' + site;
+        fs.exists(scrapper) || this.die(scrapper + " doesn't exist. Skipped", 1);
 
-    phantom.injectJs(scrapper);
- 
-    done[site] = false;
-    instances[site] = require('casper').create({
-        verbose: input.verbose,
-        logLevel: input.debug ? "debug" : "info",
-        clientScripts: ['include/jquery.min.js'],
-        pageSettings: {
-            loadImages: false,
-            loadPlugins: false,
-            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
-        }
+        phantom.injectJs(scrapper);
+        
+        jobs[site] = require('casper').create({
+            verbose: input.verbose,
+            logLevel: input.debug ? "debug" : "info",
+            clientScripts: ['include/jquery.min.js'],
+            pageSettings: {
+                loadImages: false,
+                loadPlugins: false,
+                userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0'
+            }
+        });
+        jobs[site]
+            .start()
+            .open(plugins[site].url)
+            .then(plugins[site].process)
+            .run(function() {
+                plugins[site]['done'] = true;
+            });
     });
-    instances[site]
-        .start()
-        .open(plugins[site].url)
-        .then(plugins[site].process);
 
+    return jobs;
 }
 
