@@ -11,7 +11,7 @@ plugins['google.com'] = {
                 var things = [];
                 $('.r .l').each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: $(this).attr('href')
                     });
                 });

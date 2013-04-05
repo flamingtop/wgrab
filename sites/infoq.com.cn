@@ -21,7 +21,7 @@ plugins['infoq.com.cn'] = {
                 var things = [];
                 $('.entry > h1 > a').each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: $(this).attr('href')
                     });
                 });

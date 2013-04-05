@@ -11,7 +11,7 @@ plugins['speakerdeck.com'] = {
                 var things = [];
                 $('.talk .title a').each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: 'http://speakerdeck.com' + $(this).attr('href')
                     });
                 });

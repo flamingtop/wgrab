@@ -11,7 +11,7 @@ plugins['amazon.com'] = {
                 var things = [];
                 $('.results .rslt > h3 > a').each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: $(this).attr('href')
                     });
                 });

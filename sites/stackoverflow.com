@@ -11,7 +11,7 @@ plugins['stackoverflow.com'] = {
                 var selector = /tagged/.test(location.href) ? '.question-hyperlink' : '.result-link a';
                 $(selector).each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: 'http://stackoverflow.com' + $(this).attr('href')
                     });
                 });

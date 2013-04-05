@@ -11,7 +11,7 @@ plugins['youtube.com'] = {
                 var things = [];
                 $('.yt-uix-tile-link').each(function() {
                     things.push({
-                        title: $(this).text(),
+                        title: $(this).html(),
                         link: "http://youtube.com" + $(this).attr('href')
                     });
                 });

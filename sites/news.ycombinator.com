@@ -16,7 +16,7 @@ plugins['news.ycombinator.com'] = {
                       var things = [];
                       $('.content-story-title').each(function() {
                         things.push({
-                            title: $(this).text(),
+                            title: $(this).html(),
                             link: $(this).attr('href')
                         });
                       });

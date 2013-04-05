@@ -11,7 +11,7 @@ plugins['baidu.com'] = {
                     var things = [];
                     $('h3.t a').each(function() {
                         things.push({
-                            title: $(this).text(),
+                            title: $(this).html(),
                             link: $(this).attr('href')
                         });
                     });
